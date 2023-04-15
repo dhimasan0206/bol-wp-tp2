@@ -26,7 +26,7 @@ class LoginRequest extends FormRequest
     {
         return [
             "email" => ["bail", "required", "exists:users,email", "max:255"],
-            "password" => ["bail", "required", Password::min(10)->mixedCase()->letters()->numbers()->symbols(), "max:255"],
+            "password" => ["bail", "required", "max:255"],
             "captcha" => ["bail", "required", "captcha"],
         ];
     }

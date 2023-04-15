@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,13 +32,16 @@ Route::get('login', function () {
 })->name('login')->middleware('guest');
 
 Route::post('login-process', function (LoginRequest $request) {
+    if (RateLimiter::tooManyAttempts($request->ip(), 3)) {
+        return back()->withErrors('Too many fail login attempt your ip has restricted for '.RateLimiter::availableIn($request->ip()).' second(s).');
+    }
     $credentials = $request->only(['email', 'password']);
     if (Auth::attempt($credentials, true)) {
+        RateLimiter::clear($request->ip());
         return to_route('home');
     }
-    return back()->withErrors([
-        'email' => 'The provided credentials do not match our records.',
-    ])->onlyInput('email');
+    RateLimiter::hit($request->ip(), 120);
+    return back()->withErrors('The provided credentials do not match our records');
 })->name('loginProcess')->middleware('guest');
 
 Route::get('register', function () {
