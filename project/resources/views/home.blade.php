@@ -7,8 +7,15 @@
     <title>Home</title>
 </head>
 <body>
-    Halo, {{$user->name}}
-    <a href="{{route('changePassword')}}">Ubah password</a>
-    <a href="{{route('logout')}}">Keluar</a>
+    <h3>Beranda</h3>
+    <p>
+        Halo, {{$user->name}}
+    </p>
+    <p>
+        <a href="{{route('changePassword')}}">Ubah password</a>
+    </p>
+    <p>
+        <a href="{{route('logout')}}">Keluar</a>
+    </p>
 </body>
 </html>

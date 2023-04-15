@@ -7,6 +7,7 @@
     <title>Pendaftaran berhasil</title>
 </head>
 <body>
+    <h3>Berhasil</h3>
     Pendaftaran berhasil <a href="{{route('login')}}">Login</a>
 </body>
 </html>
