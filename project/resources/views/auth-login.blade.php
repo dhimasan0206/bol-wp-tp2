@@ -9,13 +9,18 @@
 <body>
     <form action="{{route('loginProcess')}}" method="post">
         @csrf
-        <label for="email"></label>
+        <label for="email">Email</label>
         <input type="email" name="email" id="email" placeholder="Email" required>
-        <label for="password"></label>
+        <br>
+        <label for="password">Password</label>
         <input type="password" name="password" id="password" placeholder="Password" required>
+        <br>
         <button type="submit">Masuk</button>
+        <br>
         <a href="{{route('forgetPassword')}}">Lupa password</a>
-        <a href="{{route('register')}}">Daftar</a>
+        <br>
+        Belum punya akun <a href="{{route('register')}}">Daftar</a>
+        <br>
     </form>
 </body>
 </html>

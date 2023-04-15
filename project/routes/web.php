@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Requests\RegisterRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,8 +24,7 @@ Route::get('login', function () {
     return view('auth-login');
 })->name('login');
 
-Route::post('login-process', function(Request $request) {
-    // print_r($request);
+Route::post('login-process', function (Request $request) {
     // TODO: validate login and set logged in if ok else redirect back with errors
     return to_route('home');
 })->name('loginProcess');
@@ -32,11 +33,19 @@ Route::get('register', function () {
     return view('auth-register');
 })->name('register');
 
-Route::post('register-process', function(Request $request) {
-    // print_r($request);
-    // TODO: validate register and redirect to login if ok else redirect back with errors
-    return to_route('login');
+Route::post('register-process', function (RegisterRequest $request) {
+    $user = new User;
+    $user->email = $request->email;
+    $user->name = $request->name;
+    $user->password = $request->password;
+    $user->save();
+
+    return to_route('registerSuccess');
 })->name('registerProcess');
+
+Route::get('register-success', function () {
+    return view('auth-register-success');
+})->name('registerSuccess');
 
 Route::get('forget-password', function () {
     return view('auth-forget-password');
@@ -44,7 +53,6 @@ Route::get('forget-password', function () {
 
 // TODO: verify email and redirect to change password if ok else back with error
 Route::post('forget-password-process', function (Request $request) {
-    // print_r($request);
     return to_route('changePassword');
 })->name('forgetPasswordProcess');
 
@@ -55,10 +63,14 @@ Route::get('change-password', function () {
 
 // TODO: update password and redirect to login if ok else back with error
 Route::post('change-password-process', function (Request $request) {
-    // print_r($request);
     // TODO: redirect to login if not logged in; redirect back with success if logged in
-    return to_route('login');
+    return to_route('changePasswordSuccess');
 })->name('changePasswordProcess');
+
+Route::get('change-password-success', function () {
+    // TODO: redirect to login if not logged in; redirect back with success if logged in
+    return view('auth-change-password-success');
+})->name('changePasswordSuccess');
 
 Route::get('logout', function () {
     // TODO: destroy session

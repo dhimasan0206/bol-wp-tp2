@@ -9,8 +9,9 @@
 <body>
     <form action="{{route('forgetPasswordProcess')}}" method="post">
         @csrf
-        <label for="email"></label>
+        <label for="email">Email</label>
         <input type="email" name="email" id="email" placeholder="Email yang terdaftar" required>
+        <br>
         <button type="submit">Verifikasi email</button>
     </form>
 </body>
