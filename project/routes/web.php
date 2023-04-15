@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,15 +19,19 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home')->with('user', Auth::user());
 })->name('home')->middleware(['auth']);
 
 Route::get('login', function () {
     return view('auth-login');
 })->name('login');
 
-Route::post('login-process', function (Request $request) {
-    // TODO: validate login and set logged in if ok else redirect back with errors
+Route::post('login-process', function (LoginRequest $request) {
+    $user = User::where('email', $request->email)->where('password', $request->password)->first();
+    if (is_null($user)) {
+        return to_route('login')->withErrors("wrong password");
+    }
+    Auth::login($user, true);
     return to_route('home');
 })->name('loginProcess');
 
@@ -72,7 +78,9 @@ Route::get('change-password-success', function () {
     return view('auth-change-password-success');
 })->name('changePasswordSuccess');
 
-Route::get('logout', function () {
-    // TODO: destroy session
-    return to_route('home');
-});
+Route::get('logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return to_route('login');
+})->name('logout')->middleware(['auth']);

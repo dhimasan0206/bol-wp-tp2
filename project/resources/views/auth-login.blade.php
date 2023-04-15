@@ -7,14 +7,29 @@
     <title>Login</title>
 </head>
 <body>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form action="{{route('loginProcess')}}" method="post">
         @csrf
         <label for="email">Email</label>
         <input type="email" name="email" id="email" placeholder="Email" required>
         <br>
+        @error('email')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
         <label for="password">Password</label>
         <input type="password" name="password" id="password" placeholder="Password" required>
         <br>
+        @error('password')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
         <button type="submit">Masuk</button>
         <br>
         <a href="{{route('forgetPassword')}}">Lupa password</a>

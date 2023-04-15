@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
-class RegisterRequest extends FormRequest
+class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +25,8 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            "email" => ["bail", "required", "email", "unique:users", "max:255"],
-            "name" => ["bail", "required", "max:255"],
-            "password" => ["bail", "required", Password::min(10)->mixedCase()->letters()->numbers()->symbols(), "confirmed", "max:255"],
-            "password_confirmation" => ["bail", "required", Password::min(10)->mixedCase()->letters()->numbers()->symbols(), "same:password", "max:255"],
+            "email" => ["bail", "required", "exists:users,email", "max:255"],
+            "password" => ["bail", "required", Password::min(10)->mixedCase()->letters()->numbers()->symbols(), "max:255"],
         ];
     }
 }

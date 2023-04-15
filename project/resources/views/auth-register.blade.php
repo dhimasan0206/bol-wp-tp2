@@ -36,9 +36,9 @@
             <div class="alert alert-danger">{{ $message }}</div>
         @enderror
         <br>
-        <label for="confirmPassword">Re-Type Password</label>
-        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Re-Type Password" required valud="{{old('confirmPassword')}}">
-        @error('confirmPassword')
+        <label for="password_confirmation">Re-Type Password</label>
+        <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Re-Type Password" required valud="{{old('password_confirmation')}}">
+        @error('password_confirmation')
             <div class="alert alert-danger">{{ $message }}</div>
         @enderror
         <br>
