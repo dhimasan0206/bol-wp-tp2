@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\ForgetPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,43 +28,68 @@ Route::get('/', function () {
 
 Route::get('login', function () {
     return view('auth-login');
-})->name('login');
+})->name('login')->middleware('guest');
 
 Route::post('login-process', function (LoginRequest $request) {
-    $user = User::where('email', $request->email)->where('password', $request->password)->first();
-    if (is_null($user)) {
+    $user = User::where('email', $request->email)->first();
+    if (!Hash::check($request->password, $user->password)) {
         return to_route('login')->withErrors("wrong password");
     }
     Auth::login($user, true);
     return to_route('home');
-})->name('loginProcess');
+})->name('loginProcess')->middleware('guest');
 
 Route::get('register', function () {
     return view('auth-register');
-})->name('register');
+})->name('register')->middleware('guest');
 
 Route::post('register-process', function (RegisterRequest $request) {
     $user = new User;
     $user->email = $request->email;
     $user->name = $request->name;
-    $user->password = $request->password;
+    $user->password = Hash::make($request->password);
     $user->save();
 
     return to_route('registerSuccess');
-})->name('registerProcess');
+})->name('registerProcess')->middleware('guest');
 
 Route::get('register-success', function () {
     return view('auth-register-success');
-})->name('registerSuccess');
+})->name('registerSuccess')->middleware('guest');
 
 Route::get('forget-password', function () {
     return view('auth-forget-password');
-})->name('forgetPassword');
+})->name('forgetPassword')->middleware('guest');
 
-// TODO: verify email and redirect to change password if ok else back with error
-Route::post('forget-password-process', function (Request $request) {
-    return to_route('changePassword');
-})->name('forgetPasswordProcess');
+Route::post('forget-password-process', function (ForgetPasswordRequest $request) {
+    $request->session()->put('email', $request->email);
+    return to_route('resetPassword');
+})->name('forgetPasswordProcess')->middleware('guest');
+
+Route::get('reset-password', function (Request $request) {
+    if (!$request->session()->has('email')) {
+        return to_route('login');
+    }
+    return view('auth-reset-password');
+})->name('resetPassword')->middleware('guest');
+
+Route::post('reset-password-process', function (ResetPasswordRequest $request) {
+    if (!$request->session()->has('email')) {
+        return to_route('login');
+    }
+    
+    $user = User::where('email', $request->session()->get('email'))->firstOrFail();
+    $user->password = Hash::make($request->password);
+    $user->save();
+
+    $request->session()->forget('email');
+
+    return to_route('resetPasswordSuccess');
+})->name('resetPasswordProcess')->middleware('guest');
+
+Route::get('reset-password-success', function () {
+    return view('auth-reset-password-success');
+})->name('resetPasswordSuccess')->middleware('guest');
 
 Route::get('change-password', function () {
     return view('auth-change-password');
@@ -69,12 +97,12 @@ Route::get('change-password', function () {
 
 Route::post('change-password-process', function (ChangePasswordRequest $request) {
     $user = Auth::user();
-    if ($user->password != $request->password) {
+    if (!Hash::check($request->password, $user->password)) {
         return back()->withErrors("wrong current password");
     }
 
     $update = User::findOrFail($user->id);
-    $update->password = $request->new_password;
+    $update->password = Hash::make($request->new_password);
     $update->save();
 
     return to_route('changePasswordSuccess');

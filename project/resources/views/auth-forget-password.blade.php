@@ -7,11 +7,23 @@
     <title>Forget Password</title>
 </head>
 <body>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form action="{{route('forgetPasswordProcess')}}" method="post">
         @csrf
         <label for="email">Email</label>
-        <input type="email" name="email" id="email" placeholder="Email yang terdaftar" required>
+        <input type="email" name="email" id="email" placeholder="Email yang terdaftar" required value="{{old('email')}}">
         <br>
+        @error('email')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
         <button type="submit">Verifikasi email</button>
     </form>
 </body>
