@@ -64,11 +64,9 @@ Route::post('forget-password-process', function (Request $request) {
 })->name('forgetPasswordProcess');
 
 Route::get('change-password', function () {
-    // TODO: check email session or user session
     return view('auth-change-password');
 })->name('changePassword')->middleware(['auth']);
 
-// TODO: update password and redirect to login if ok else back with error
 Route::post('change-password-process', function (ChangePasswordRequest $request) {
     $user = Auth::user();
     if ($user->password != $request->password) {
