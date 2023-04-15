@@ -31,12 +31,13 @@ Route::get('login', function () {
 })->name('login')->middleware('guest');
 
 Route::post('login-process', function (LoginRequest $request) {
-    $user = User::where('email', $request->email)->first();
-    if (!Hash::check($request->password, $user->password)) {
-        return to_route('login')->withErrors("wrong password");
+    $credentials = $request->only(['email', 'password']);
+    if (Auth::attempt($credentials, true)) {
+        return to_route('home');
     }
-    Auth::login($user, true);
-    return to_route('home');
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
 })->name('loginProcess')->middleware('guest');
 
 Route::get('register', function () {
