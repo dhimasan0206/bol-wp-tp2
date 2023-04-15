@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
@@ -65,18 +66,25 @@ Route::post('forget-password-process', function (Request $request) {
 Route::get('change-password', function () {
     // TODO: check email session or user session
     return view('auth-change-password');
-})->name('changePassword');
+})->name('changePassword')->middleware(['auth']);
 
 // TODO: update password and redirect to login if ok else back with error
-Route::post('change-password-process', function (Request $request) {
-    // TODO: redirect to login if not logged in; redirect back with success if logged in
+Route::post('change-password-process', function (ChangePasswordRequest $request) {
+    $user = Auth::user();
+    if ($user->password != $request->password) {
+        return back()->withErrors("wrong current password");
+    }
+
+    $update = User::findOrFail($user->id);
+    $update->password = $request->new_password;
+    $update->save();
+
     return to_route('changePasswordSuccess');
-})->name('changePasswordProcess');
+})->name('changePasswordProcess')->middleware(['auth']);
 
 Route::get('change-password-success', function () {
-    // TODO: redirect to login if not logged in; redirect back with success if logged in
     return view('auth-change-password-success');
-})->name('changePasswordSuccess');
+})->name('changePasswordSuccess')->middleware(['auth']);
 
 Route::get('logout', function (Request $request) {
     Auth::logout();

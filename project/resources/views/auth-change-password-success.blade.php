@@ -7,6 +7,6 @@
     <title>Ubah password berhasil</title>
 </head>
 <body>
-    Ubah password berhasil <a href="{{route('login')}}">Login</a>
+    Ubah password berhasil <a href="{{route('home')}}">Beranda</a>
 </body>
 </html>
